@@ -85,6 +85,15 @@ def status_do_dia(data_hora, periodos):
 	return STATUS_SEM_AGUA
 
 
+def formatar_periodos(periodos, data_hora):
+	"""Formata os períodos, destacando aquele que contém a data informada."""
+	periodos_ativos = periodos_que_contem_data(data_hora, periodos)
+	return [
+		f"{'🟢' if periodo in periodos_ativos else '🔹'}{epoch_para_data_hora(periodo['inicio'])} → {epoch_para_data_hora(periodo['termino'])}"
+		for periodo in periodos
+	]
+
+
 def montar_url(mes, ano):
 	url_base = (
 		"https://geo.compesa.com.br:6443/arcgis/rest/services/Calendario/"
@@ -135,13 +144,8 @@ def main():
 		print("Nenhum período encontrado.")
 		return
 
-	periodos_formatados = []
-
-	for numero, periodo in enumerate(periodos[2], start=1):
-		inicio = epoch_para_data_hora(periodo["inicio"])
-		termino = epoch_para_data_hora(periodo["termino"])
-		colapso = periodo["colapso"]
-		periodos_formatados.append(f"🔹{inicio} → {termino}")
+	data_hoje = datetime.now(FUSO_LOCAL)
+	periodos_formatados = formatar_periodos(periodos[2], data_hoje)
 
 	url = f"{OPENWA_API_URL}/api/sessions/{SESSION_ID}/start"
 
@@ -171,7 +175,6 @@ def main():
 	}.get(mes_atual, f"MÊS {mes_atual:02d}")
 
 	# verificar se hoje tem água, se é o último dia ou se não tem água
-	data_hoje = datetime.now(FUSO_LOCAL)
 	status_hoje = MENSAGENS_STATUS[status_do_dia(data_hoje, periodos[2])]
 
 	mensagem_datas = "\n".join(periodos_formatados)
