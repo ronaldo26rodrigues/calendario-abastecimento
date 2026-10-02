@@ -1,0 +1,4 @@
+# Lista de destinatários
+DESTINATARIOS = [
+    
+]
