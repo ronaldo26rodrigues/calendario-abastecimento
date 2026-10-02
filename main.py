@@ -184,7 +184,6 @@ def main():
 
 
 {status_hoje}
-{data_hoje.strftime("%d/%m/%Y %H:%M:%S")}
 	"""
 	print(mensagem)
 
